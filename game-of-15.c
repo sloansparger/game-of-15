@@ -3,9 +3,17 @@
 #include <string.h>
 #include <curses.h>
 
+#define UP    1
+#define RIGHT 3
+#define DOWN  2
+#define LEFT  4
+
 void init(int size, int board[][size]);
 void draw(int size, int board[][size]);
+void move_piece(int size, int board[][size], int direction);
 int win(int size, int board[][size]);
+void swap(int *a, int *b);
+void clear_screen();
 
 int main(int argc, char *argv[0])
 {
@@ -32,6 +40,7 @@ int main(int argc, char *argv[0])
       }
 
       init(size, board);
+      clear_screen();
       draw(size, board);
 
       do {
@@ -41,16 +50,18 @@ int main(int argc, char *argv[0])
           switch(getchar())
           {
             case 'A':
-              printf("UP\n");
+              move_piece(size, board, UP);
               break;
             case 'B':
-              printf("DOWN\n");
+              move_piece(size, board, DOWN);
               break;
             case 'C':
-              printf("RIGHT\n");
+              move_piece(size, board, RIGHT);
               break;
             case 'D':
-              printf("LEFT\n");
+              move_piece(size, board, LEFT);
+              break;
+            default:
               break;
           }
         }
@@ -111,9 +122,75 @@ void draw(int size, int board[][size])
   }
 }
 
+void move_piece(int size, int board[][size], int direction)
+{
+  bool stop = false;
+  int x, y;
+
+  clear_screen();
+  for (int i = 0; i < size && !stop; i++)
+  {
+    for (int j = 0; j < size && !stop; j++)
+    {
+      if (board[i][j] == 0)
+      {
+        y = i;
+        x = j;
+        stop = true;
+      }
+    }
+  }
+
+  if (direction == DOWN) {
+    if (y == 0) {
+      // invalid move
+      printf("DO NOTHING\n");
+    } else {
+      swap(&board[y][x], &board[y - 1][x]);
+      printf("DIRECTION IS UP. LOCATION OF ZERO IS: x = %d and y = %d.\n", x, y);
+    }
+  } else if (direction == UP) {
+    if (y + 1 == size) {
+      // invalid move
+      printf("DO NOTHING\n");
+    } else {
+      swap(&board[y][x], &board[y + 1][x]);
+      printf("DIRECTION IS DOWN. LOCATION OF ZERO IS: x = %d and y = %d.\n", x, y);
+    }
+  } else if (direction == LEFT) {
+    if (x + 1 == size) {
+      // invalid move
+      printf("DO NOTHING\n");
+    } else {
+      swap(&board[y][x], &board[y][x + 1]);
+      printf("DIRECTION IS RIGHT. LOCATION OF ZERO IS: x = %d and y = %d.\n", x, y);
+    }
+  } else {
+    if (x == 0) {
+      // invalid move
+      printf("DO NOTHING\n");
+    } else {
+      swap(&board[y][x], &board[y][x - 1]);
+      printf("DIRECTION IS LEFT. LOCATION OF ZERO IS: x = %d and y = %d.\n", x, y);
+    }
+  }   
+
+  draw(size, board);
+}
+
 int win(int size, int board[][size])
 {
   return false;
 }
 
+void clear_screen()
+{
+  printf("\e[1;1H\e[2J");
+}
 
+void swap(int *a, int *b)
+{
+  int temp = *a;
+  *a = *b;
+  *b = temp;
+}
