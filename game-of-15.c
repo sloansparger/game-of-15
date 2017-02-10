@@ -11,7 +11,7 @@
 void init(int size, int board[][size]);
 void draw(int size, int board[][size]);
 void move_piece(int size, int board[][size], int direction);
-int win(int size, int board[][size]);
+bool win(int size, int board[][size]);
 void swap(int *a, int *b);
 void clear_screen();
 
@@ -144,43 +144,61 @@ void move_piece(int size, int board[][size], int direction)
   if (direction == DOWN) {
     if (y == 0) {
       // invalid move
-      printf("DO NOTHING\n");
     } else {
       swap(&board[y][x], &board[y - 1][x]);
-      printf("DIRECTION IS UP. LOCATION OF ZERO IS: x = %d and y = %d.\n", x, y);
     }
   } else if (direction == UP) {
     if (y + 1 == size) {
       // invalid move
-      printf("DO NOTHING\n");
     } else {
       swap(&board[y][x], &board[y + 1][x]);
-      printf("DIRECTION IS DOWN. LOCATION OF ZERO IS: x = %d and y = %d.\n", x, y);
     }
   } else if (direction == LEFT) {
     if (x + 1 == size) {
       // invalid move
-      printf("DO NOTHING\n");
     } else {
       swap(&board[y][x], &board[y][x + 1]);
-      printf("DIRECTION IS RIGHT. LOCATION OF ZERO IS: x = %d and y = %d.\n", x, y);
     }
   } else {
     if (x == 0) {
       // invalid move
-      printf("DO NOTHING\n");
     } else {
       swap(&board[y][x], &board[y][x - 1]);
-      printf("DIRECTION IS LEFT. LOCATION OF ZERO IS: x = %d and y = %d.\n", x, y);
     }
   }   
 
   draw(size, board);
 }
 
-int win(int size, int board[][size])
+bool win(int size, int board[][size])
 {
-  return false;
+  // TODO: all that is needed to complete the game it to make sure that the user has one. if they have won,
+  // clear the board and show message that they have won.
+
+  bool winning = true;
+
+  for (int i = 0; i < size && winning; i++)
+  {
+    for (int j = 0; j < size && winning; j++)
+    {
+      if (board[i][j] != (j + 1) + (i * size))
+      {
+        printf("board[%d][%d] = %d. Should be: %d.\n", i, j, board[i][j], (j + 1) + (i * size));
+        winning = false;
+      }
+
+      printf("i = %d, size = %d, j = %d, board[size - 1][size - 1] = %d\n", i, size, j, board[size - 1][size - 1]);
+      if (i == size - 1 && j == size - 1 && board[i][j] == 0)
+      {
+        clear_screen();
+        printf("YOU WON!!!!.\n");
+        winning = true;
+      }
+
+    }
+  }
+
+  return winning;
 }
 
 void clear_screen()
